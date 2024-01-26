@@ -1,0 +1,81 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: ora2pg-delta
+spec:
+  schedule: 0 5 * * *
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+            volumes:
+              - name: ora2pg-vol
+                persistentVolumeClaim:
+                  claimName: ora2pg-pvc
+              - name: ssh-key
+                secret:
+                  secretName: cas-ssh
+                  items:
+                  - key: known_hosts
+                    path: known_hosts
+                    readOnly: true
+              - name: ssh-rsa
+                secret:
+                  secretName: cas-ssh-key
+                  items:
+                  - key: id_rsa
+                    path: id_rsa
+                    readOnly: true
+            containers:
+              - resources:
+                  limits:
+                    cpu: 250m
+                    memory: 1Gi
+                  requests:
+                    cpu: 50m
+                    memory: 256Mi
+                terminationMessagePath: /dev/termination-log
+                name: alpine
+                command:
+                  - sleep
+                  - infinity
+                imagePullPolicy: Always
+                volumeMounts:
+                  - name: ora2pg-vol
+                    mountPath: /data
+                  - name: ssh-key
+                    mountPath: "/.ssh"
+                    readOnly: true
+                  - name: ssh-rsa
+                    mountPath: "/.ssh/rsa"
+                    readOnly: true
+                terminationMessagePolicy: File
+                image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/alpine-ssh:latest
+              resources:
+                limits:
+                  cpu: '1'
+                  memory: 5Gi
+                requests:
+                  cpu: 200m
+                  memory: 3Gi
+              volumeMounts:
+                - name: ora2pg-data-today-vol
+                  mountPath: /data/
+                - name: ora2pg-data-yesterday-vol
+                  mountPath: /data-yesterday/
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: Always
+            restartPolicy: OnFailure
+            terminationGracePeriodSeconds: 30
+            dnsPolicy: ClusterFirst
+            securityContext: {}
+            schedulerName: default-scheduler
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
