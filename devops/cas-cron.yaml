@@ -1,7 +1,7 @@
 kind: CronJob
 apiVersion: batch/v1
 metadata:
-  name: ora2pg-delta
+  name: ora2pg-cas
 spec:
   schedule: 0 5 * * *
   concurrencyPolicy: Allow
@@ -17,7 +17,7 @@ spec:
             volumes:
               - name: ora2pg-vol
                 persistentVolumeClaim:
-                  claimName: ora2pg-pvc
+                  claimName: ora2pg-cas
               - name: ssh-key
                 secret:
                   secretName: cas-ssh
@@ -41,10 +41,7 @@ spec:
                     cpu: 50m
                     memory: 256Mi
                 terminationMessagePath: /dev/termination-log
-                name: alpine
-                command:
-                  - sleep
-                  - infinity
+                name: cas-puller
                 imagePullPolicy: Always
                 volumeMounts:
                   - name: ora2pg-vol
@@ -56,22 +53,18 @@ spec:
                     mountPath: "/.ssh/rsa"
                     readOnly: true
                 terminationMessagePolicy: File
-                image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/alpine-ssh:latest
-              resources:
-                limits:
-                  cpu: '1'
-                  memory: 5Gi
-                requests:
-                  cpu: 200m
-                  memory: 3Gi
-              volumeMounts:
-                - name: ora2pg-data-today-vol
-                  mountPath: /data/
-                - name: ora2pg-data-yesterday-vol
-                  mountPath: /data-yesterday/
-              terminationMessagePath: /dev/termination-log
-              terminationMessagePolicy: File
-              imagePullPolicy: Always
+                image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/cas-puller:latest
+                env:
+                  - name: NETTLE_IP
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: NETTLE_IP
+                  - name: ORA_CONF
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: ORA_CONF
             restartPolicy: OnFailure
             terminationGracePeriodSeconds: 30
             dnsPolicy: ClusterFirst
