@@ -18,6 +18,10 @@ spec:
               - name: ora2pg-vol
                 persistentVolumeClaim:
                   claimName: ora2pg-cas
+              - name: ssh-config
+                configMap:
+                  name: ssh-config
+                  defaultMode: 420
               - name: ssh-key
                 secret:
                   secretName: cas-ssh
@@ -46,11 +50,16 @@ spec:
                 volumeMounts:
                   - name: ora2pg-vol
                     mountPath: /data
+                  - name: ssh-config
+                    readOnly: true
+                    mountPath: /.ssh/config
+                    subPath: config
                   - name: ssh-key
-                    mountPath: "/.ssh"
+                    mountPath: /.ssh/known_hosts
+                    subPath: known_hosts
                     readOnly: true
                   - name: ssh-rsa
-                    mountPath: "/.ssh/rsa"
+                    mountPath: /.ssh/rsa
                     readOnly: true
                 terminationMessagePolicy: File
                 image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/cas-puller:latest
@@ -60,11 +69,16 @@ spec:
                       secretKeyRef:
                         name: ora2pg-cas
                         key: NETTLE_IP
-                  - name: ORA_CONF
+                  - name: ORA_CONF_UPDATE
                     valueFrom:
                       secretKeyRef:
                         name: ora2pg-cas
-                        key: ORA_CONF
+                        key: ORA_CONF_UPDATE
+                  - name: ORA_CONF_INSERT
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: ORA_CONF_INSERT
             restartPolicy: OnFailure
             terminationGracePeriodSeconds: 30
             dnsPolicy: ClusterFirst
