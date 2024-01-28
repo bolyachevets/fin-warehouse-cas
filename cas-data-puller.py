@@ -19,6 +19,7 @@ def main():
 def run_ora2pg(config_file):
     print('Running ora2pg with ' + config_file)
     timeout = 'OCIServerAttach'
+    session = 'OCISessionBegin'
 
     repeat = 0
     while True:
@@ -28,7 +29,7 @@ def run_ora2pg(config_file):
             print('---')
             ret = subprocess.run(['/usr/perl5/5.36/bin/ora2pg', '--basedir', '/dsk01/warehouse', '-c', config_file], capture_output=True, text=True)
             print(ret.stdout)
-            if timeout not in ret.stdout:
+            if timeout not in ret.stdout and session not in ret.stdout:
                 break
         except Exception as e:
             print('retrying data pull with' + config_file)
