@@ -64,6 +64,11 @@ spec:
                 terminationMessagePolicy: File
                 image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/cas-puller:latest
                 env:
+                  - name: PATCH_CONFIG
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: PATCH_CONFIG
                   - name: NETTLE_IP
                     valueFrom:
                       secretKeyRef:
