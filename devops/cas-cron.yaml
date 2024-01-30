@@ -3,7 +3,7 @@ apiVersion: batch/v1
 metadata:
   name: ora2pg-cas
 spec:
-  schedule: 0 5 * * *
+  schedule: 0 13 * * 2-6
   concurrencyPolicy: Forbid
   suspend: false
   jobTemplate:
