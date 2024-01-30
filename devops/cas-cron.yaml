@@ -79,11 +79,6 @@ spec:
                       secretKeyRef:
                         name: ora2pg-cas
                         key: ORA_CONF_UPDATE
-                  - name: ORA_CONF_INSERT
-                    valueFrom:
-                      secretKeyRef:
-                        name: ora2pg-cas
-                        key: ORA_CONF_INSERT
                   - name: UPDATE_DIR
                     valueFrom:
                       secretKeyRef:
