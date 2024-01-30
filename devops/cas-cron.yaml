@@ -79,6 +79,11 @@ spec:
                       secretKeyRef:
                         name: ora2pg-cas
                         key: ORA_CONF_INSERT
+                  - name: UPDATE_DIR
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: UPDATE_DIR
             restartPolicy: OnFailure
             terminationGracePeriodSeconds: 30
             dnsPolicy: ClusterFirst
