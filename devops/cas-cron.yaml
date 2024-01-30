@@ -3,7 +3,7 @@ apiVersion: batch/v1
 metadata:
   name: ora2pg-cas
 spec:
-  schedule: 0 5 * * *
+  schedule: 0 13 * * 2-6
   concurrencyPolicy: Forbid
   suspend: false
   jobTemplate:
@@ -64,6 +64,11 @@ spec:
                 terminationMessagePolicy: File
                 image: image-registry.openshift-image-registry.svc:5000/78c88a-tools/cas-puller:latest
                 env:
+                  - name: PATCH_CONFIG
+                    valueFrom:
+                      secretKeyRef:
+                        name: ora2pg-cas
+                        key: PATCH_CONFIG
                   - name: NETTLE_IP
                     valueFrom:
                       secretKeyRef:
@@ -74,11 +79,11 @@ spec:
                       secretKeyRef:
                         name: ora2pg-cas
                         key: ORA_CONF_UPDATE
-                  - name: ORA_CONF_INSERT
+                  - name: UPDATE_DIR
                     valueFrom:
                       secretKeyRef:
                         name: ora2pg-cas
-                        key: ORA_CONF_INSERT
+                        key: UPDATE_DIR
             restartPolicy: OnFailure
             terminationGracePeriodSeconds: 30
             dnsPolicy: ClusterFirst
