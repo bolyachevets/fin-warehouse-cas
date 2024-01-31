@@ -1,6 +1,7 @@
 #! /bin/sh
 cd /opt/app-root
 echo 'run ora2pg on nettle'
+rm /data/update/*
 if [ "$PATCH_CONFIG" == true ]; then
   cat cas-patch-config.py | ssh -v -i ~/.ssh/rsa/id_rsa "$NETTLE_IP" python - "$ORA_CONF_UPDATE"
 fi
