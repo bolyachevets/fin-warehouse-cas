@@ -7,9 +7,9 @@ constraints = {'gl_je_lines': '(je_header_id, je_line_number)',
                'ar_receipts': '(receipt_id)',
                'ar_applied_receivables': '(applied_receivable_key)',
                'ar_adjustments': '(adjustment_number, org_id, adjustment_id)',
-               'ap_invoices':  '(invoice_id)'}
+               'ap_invoices': '(invoice_id)',
+               'ap_invoice_payments': '(invoice_id, invoice_number, payment_number, prepay_invoice_id)'}
 
-skip_files = ['AP_INVOICE_PAYMENTS_output.sql']
 
 def process_update(path, update_file):
     host = open(os.path.join(path, update_file), "r")
@@ -41,7 +41,7 @@ def process_update(path, update_file):
 if __name__ == '__main__':
     update_dir = os.environ['UPDATE_DIR']
     for i in os.listdir(update_dir):
-        if os.path.isfile(os.path.join(update_dir, i)) and '_output.sql' in i and i not in skip_files:
+        if os.path.isfile(os.path.join(update_dir, i)) and '_output.sql' in i:
             print('starting...')
             print(i)
             process_update(update_dir, i)
