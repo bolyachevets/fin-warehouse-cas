@@ -12,7 +12,7 @@ constraints = {'gl_je_lines': '(je_header_id, je_line_number)',
 
 
 def process_update(path, update_file):
-    host = open(os.path.join(path, update_file), "r")
+    host = open(os.path.join(path, update_file), "r", encoding="ISO-8859-1")
     try:
         with open(path + '/' + '_delta.sql', "w") as out:
             out.write('SET client_encoding TO \'UTF8\';\n')
